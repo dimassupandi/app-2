@@ -1,0 +1,27 @@
+name: Deploy Aplikasi 1 (Port 2000)
+
+on:
+  push:
+    branches:
+      - main # Memicu deployment ketika ada push ke branch 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy ke Server 2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ''
+          script: |
+            # Ganti direktori target ke web2
+            TARGET_DIR="/var/www/web2.com/public_html" 
+            rsync -avz --delete ./ $TARGET_DIR/
+            sudo chown -R www-data:www-data $TARGET_DIR
+            echo "Deployment Aplikasi 2 berhasil ke $TARGET_DIR"
